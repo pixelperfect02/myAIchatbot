@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f0f0; }
+        .chatbox { max-width: 600px; margin: 50px auto; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .messages { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }
+        .input-container { display: flex; justify-content: space-between; }
+        input[type="text"] { width: 80%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .user-message { color: blue; }
+        .bot-message { color: green; }
+    </style>
+</head>
+<body>
+    <div class="chatbox">
+        <div class="messages" id="messages">
+            <!-- Messages will appear here -->
+        </div>
+        <div class="input-container">
+            <input type="text" id="user_input" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            var userMessage = document.getElementById('user_input').value;
+            if (userMessage) {
+                // Display user message
+                var messageDiv = document.createElement('div');
+                messageDiv.classList.add('user-message');
+                messageDiv.textContent = 'You: ' + userMessage;
+                document.getElementById('messages').appendChild(messageDiv);
+
+                // Send AJAX request to Flask backend
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/ask", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        var botMessage = response.response;
+                        
+                        // Display bot message
+                        var botDiv = document.createElement('div');
+                        botDiv.classList.add('bot-message');
+                        botDiv.textContent = 'Bot: ' + botMessage;
+                        document.getElementById('messages').appendChild(botDiv);
+                    }
+                };
+                xhr.send("message=" + encodeURIComponent(userMessage));
+                document.getElementById('user_input').value = '';  // Clear input field
+            }
+        }
+    </script>
+</body>
+</html>
